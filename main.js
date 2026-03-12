@@ -1,35 +1,87 @@
-// Financial Datasets API
-const API_BASE = 'https://api.financialdatasets.ai';
-// Set your API key here or in localStorage as 'fd_api_key'
-const API_KEY = localStorage.getItem('fd_api_key') || '';
+// Static financial data (fetched 2026-03-12, no API key required)
+const STATIC_DATA = {
+  AAPL: {
+    facts: {
+      ticker: "AAPL", name: "Apple Inc", sector: "Information Technology",
+      industry: "Technology Hardware, Storage & Peripherals",
+      exchange: "NASDAQ", location: "California; U.S.A", is_active: true
+    },
+    snapshot: { price: 255, day_change: -5.83, day_change_percent: -2.24 },
+    statements: [
+      { fiscal_period:"2025-FY", revenue:416161000000, cost_of_revenue:220960000000, gross_profit:195201000000, operating_income:133050000000, net_income:112010000000, earnings_per_share_diluted:7.46 },
+      { fiscal_period:"2024-FY", revenue:391035000000, cost_of_revenue:210352000000, gross_profit:180683000000, operating_income:123216000000, net_income:93736000000,  earnings_per_share_diluted:6.08 },
+      { fiscal_period:"2023-FY", revenue:383285000000, cost_of_revenue:214137000000, gross_profit:169148000000, operating_income:114301000000, net_income:96995000000,  earnings_per_share_diluted:6.13 },
+      { fiscal_period:"2022-FY", revenue:394328000000, cost_of_revenue:223546000000, gross_profit:170782000000, operating_income:119437000000, net_income:99803000000,  earnings_per_share_diluted:6.11 },
+    ]
+  },
+  MSFT: {
+    facts: {
+      ticker: "MSFT", name: "Microsoft Corp", sector: "Information Technology",
+      industry: "Software", exchange: "NASDAQ", location: "Washington; U.S.A", is_active: true
+    },
+    snapshot: { price: 403.53, day_change: -2.23, day_change_percent: -0.55 },
+    statements: [
+      { fiscal_period:"2025-FY", revenue:281724000000, cost_of_revenue:87831000000, gross_profit:193893000000, operating_income:128528000000, net_income:101832000000, earnings_per_share_diluted:13.64 },
+      { fiscal_period:"2024-FY", revenue:245122000000, cost_of_revenue:74114000000, gross_profit:171008000000, operating_income:109433000000, net_income:88136000000,  earnings_per_share_diluted:11.80 },
+      { fiscal_period:"2023-FY", revenue:211915000000, cost_of_revenue:65863000000, gross_profit:146052000000, operating_income:88523000000,  net_income:72361000000,  earnings_per_share_diluted:9.68  },
+      { fiscal_period:"2022-FY", revenue:198270000000, cost_of_revenue:62650000000, gross_profit:135620000000, operating_income:83383000000,  net_income:72738000000,  earnings_per_share_diluted:9.65  },
+    ]
+  },
+  TSLA: {
+    facts: {
+      ticker: "TSLA", name: "Tesla Inc", sector: "Consumer Discretionary",
+      industry: "Automobiles", exchange: "NASDAQ", location: "California; U.S.A", is_active: true
+    },
+    snapshot: { price: 396.9, day_change: -2.34, day_change_percent: -0.59 },
+    statements: [
+      { fiscal_period:"2025-FY", revenue:94827000000,  cost_of_revenue:77733000000, gross_profit:17094000000, operating_income:4355000000,  net_income:3794000000,  earnings_per_share_diluted:1.08 },
+      { fiscal_period:"2024-FY", revenue:97690000000,  cost_of_revenue:80240000000, gross_profit:17450000000, operating_income:7076000000,  net_income:7091000000,  earnings_per_share_diluted:2.04 },
+      { fiscal_period:"2023-FY", revenue:96773000000,  cost_of_revenue:79113000000, gross_profit:17660000000, operating_income:8891000000,  net_income:14997000000, earnings_per_share_diluted:4.30 },
+      { fiscal_period:"2022-FY", revenue:81462000000,  cost_of_revenue:60609000000, gross_profit:20853000000, operating_income:13656000000, net_income:12556000000, earnings_per_share_diluted:3.62 },
+    ]
+  },
+  GOOGL: {
+    facts: {
+      ticker: "GOOGL", name: "Alphabet Inc", sector: "Communication Services",
+      industry: "Interactive Media & Services", exchange: "NASDAQ", location: "California; U.S.A", is_active: true
+    },
+    snapshot: { price: 302.7, day_change: -4.34, day_change_percent: -1.41 },
+    statements: [
+      { fiscal_period:"FY2025", revenue:402836000000, cost_of_revenue:162535000000, gross_profit:240301000000, operating_income:129039000000, net_income:132170000000, earnings_per_share_diluted:10.81 },
+      { fiscal_period:"2024-FY", revenue:350018000000, cost_of_revenue:146306000000, gross_profit:203712000000, operating_income:112390000000, net_income:100118000000, earnings_per_share_diluted:8.04  },
+      { fiscal_period:"2023-FY", revenue:307394000000, cost_of_revenue:133332000000, gross_profit:174062000000, operating_income:84293000000,  net_income:73795000000,  earnings_per_share_diluted:5.80  },
+      { fiscal_period:"2022-FY", revenue:282836000000, cost_of_revenue:126203000000, gross_profit:156633000000, operating_income:74842000000,  net_income:59972000000,  earnings_per_share_diluted:4.56  },
+    ]
+  },
+  NVDA: {
+    facts: {
+      ticker: "NVDA", name: "Nvidia Corp", sector: "Information Technology",
+      industry: "Semiconductors & Semiconductor Equipment", exchange: "NASDAQ", location: "California; U.S.A", is_active: true
+    },
+    snapshot: { price: 182.07, day_change: -2.7, day_change_percent: -1.46 },
+    statements: [
+      { fiscal_period:"2026-FY", revenue:215938000000, cost_of_revenue:62475000000,  gross_profit:153463000000, operating_income:130387000000, net_income:120067000000, earnings_per_share_diluted:4.90 },
+      { fiscal_period:"2025-FY", revenue:130497000000, cost_of_revenue:32639000000,  gross_profit:97858000000,  operating_income:81453000000,  net_income:72880000000,  earnings_per_share_diluted:2.94 },
+      { fiscal_period:"2024-FY", revenue:60922000000,  cost_of_revenue:16621000000,  gross_profit:44301000000,  operating_income:32972000000,  net_income:29760000000,  earnings_per_share_diluted:1.19 },
+      { fiscal_period:"2023-FY", revenue:26974000000,  cost_of_revenue:11618000000,  gross_profit:15356000000,  operating_income:4224000000,   net_income:4368000000,   earnings_per_share_diluted:0.17 },
+    ]
+  }
+};
+
+const TICKERS = Object.keys(STATIC_DATA);
 
 let revenueChart = null;
 let netIncomeChart = null;
 
-async function fetchJSON(url) {
-  const headers = API_KEY ? { 'X-API-KEY': API_KEY } : {};
-  const res = await fetch(url, { headers });
-  if (!res.ok) throw new Error(`API error ${res.status}: ${res.statusText}`);
-  return res.json();
-}
-
 function fmt(num) {
-  if (num === null || num === undefined) return '—';
+  if (num == null) return '—';
   const abs = Math.abs(num);
   if (abs >= 1e12) return (num / 1e12).toFixed(2) + 'T';
   if (abs >= 1e9)  return (num / 1e9).toFixed(2) + 'B';
   if (abs >= 1e6)  return (num / 1e6).toFixed(2) + 'M';
   return num.toLocaleString();
 }
-
-function fmtUSD(num) {
-  if (num === null || num === undefined) return '—';
-  return '$' + fmt(num);
-}
-
-function showLoading(show) {
-  document.getElementById('loading').classList.toggle('hidden', !show);
-}
+function fmtUSD(num) { return num == null ? '—' : '$' + fmt(num); }
 
 function showError(msg) {
   const el = document.getElementById('error');
@@ -38,103 +90,67 @@ function showError(msg) {
 }
 
 function renderCompany(facts, snapshot) {
-  document.getElementById('companyName').textContent = facts.name || '—';
-  document.getElementById('companyTicker').textContent = facts.ticker || '—';
-  document.getElementById('companyExchange').textContent = facts.exchange || '—';
-  document.getElementById('companySector').textContent = facts.sector || '—';
-  document.getElementById('companyIndustry').textContent = facts.industry || '—';
-  document.getElementById('companyLocation').textContent = facts.location || '—';
-  document.getElementById('companyStatus').textContent = facts.is_active ? 'Active' : 'Inactive';
+  document.getElementById('companyName').textContent     = facts.name;
+  document.getElementById('companyTicker').textContent   = facts.ticker;
+  document.getElementById('companyExchange').textContent = facts.exchange;
+  document.getElementById('companySector').textContent   = facts.sector;
+  document.getElementById('companyIndustry').textContent = facts.industry;
+  document.getElementById('companyLocation').textContent = facts.location;
+  document.getElementById('companyStatus').textContent   = facts.is_active ? 'Active' : 'Inactive';
 
-  if (snapshot) {
-    document.getElementById('stockPrice').textContent = '$' + snapshot.price.toFixed(2);
-    const pct = snapshot.day_change_percent;
-    const chg = snapshot.day_change;
-    const sign = chg >= 0 ? '+' : '';
-    const changeEl = document.getElementById('stockChange');
-    changeEl.textContent = `${sign}${chg.toFixed(2)} (${sign}${pct.toFixed(2)}%)`;
-    changeEl.className = 'change ' + (chg >= 0 ? 'positive' : 'negative');
-  }
+  document.getElementById('stockPrice').textContent = '$' + snapshot.price.toFixed(2);
+  const sign = snapshot.day_change >= 0 ? '+' : '';
+  const changeEl = document.getElementById('stockChange');
+  changeEl.textContent = `${sign}${snapshot.day_change.toFixed(2)} (${sign}${snapshot.day_change_percent.toFixed(2)}%)`;
+  changeEl.className = 'change ' + (snapshot.day_change >= 0 ? 'positive' : 'negative');
 }
 
 function renderMetrics(statements) {
-  if (!statements.length) return;
-  const latest = statements[0];
-  document.getElementById('metricRevenue').textContent = fmtUSD(latest.revenue);
-  document.getElementById('metricNetIncome').textContent = fmtUSD(latest.net_income);
-  document.getElementById('metricEPS').textContent = latest.earnings_per_share_diluted != null
-    ? '$' + latest.earnings_per_share_diluted.toFixed(2) : '—';
-  const margin = latest.gross_profit && latest.revenue
-    ? ((latest.gross_profit / latest.revenue) * 100).toFixed(1) + '%'
-    : '—';
+  const s = statements[0];
+  document.getElementById('metricRevenue').textContent    = fmtUSD(s.revenue);
+  document.getElementById('metricNetIncome').textContent  = fmtUSD(s.net_income);
+  document.getElementById('metricEPS').textContent        = s.earnings_per_share_diluted != null ? '$' + s.earnings_per_share_diluted.toFixed(2) : '—';
+  const margin = s.gross_profit && s.revenue ? ((s.gross_profit / s.revenue) * 100).toFixed(1) + '%' : '—';
   document.getElementById('metricGrossMargin').textContent = margin;
 }
 
 function renderCharts(statements) {
-  const reversed = [...statements].reverse();
-  const labels = reversed.map(s => s.fiscal_period || s.report_period);
-  const revenues = reversed.map(s => s.revenue / 1e9);
-  const netIncomes = reversed.map(s => s.net_income / 1e9);
+  const rev = [...statements].reverse();
+  const labels   = rev.map(s => s.fiscal_period);
+  const revenues = rev.map(s => s.revenue / 1e9);
+  const incomes  = rev.map(s => s.net_income / 1e9);
 
-  const chartDefaults = {
-    borderRadius: 6,
-    borderSkipped: false,
-  };
+  if (revenueChart)   revenueChart.destroy();
+  if (netIncomeChart) netIncomeChart.destroy();
 
-  if (revenueChart) revenueChart.destroy();
-  revenueChart = new Chart(document.getElementById('revenueChart'), {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [{
-        label: 'Revenue (B USD)',
-        data: revenues,
-        backgroundColor: '#2563ebaa',
-        borderColor: '#2563eb',
-        borderWidth: 1,
-        ...chartDefaults,
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: { legend: { labels: { color: '#94a3b8' } } },
-      scales: {
-        x: { ticks: { color: '#64748b' }, grid: { color: '#1e2a3a' } },
-        y: { ticks: { color: '#64748b', callback: v => '$' + v + 'B' }, grid: { color: '#1e2a3a' } }
-      }
+  const commonOpts = () => ({
+    responsive: true,
+    plugins: { legend: { labels: { color: '#94a3b8' } } },
+    scales: {
+      x: { ticks: { color: '#64748b' }, grid: { color: '#1e2a3a' } },
+      y: { ticks: { color: '#64748b', callback: v => '$' + v + 'B' }, grid: { color: '#1e2a3a' } }
     }
   });
 
-  if (netIncomeChart) netIncomeChart.destroy();
+  revenueChart = new Chart(document.getElementById('revenueChart'), {
+    type: 'bar',
+    data: { labels, datasets: [{ label: 'Revenue (B USD)', data: revenues,
+      backgroundColor: '#2563ebaa', borderColor: '#2563eb', borderWidth: 1, borderRadius: 6 }] },
+    options: commonOpts()
+  });
+
   netIncomeChart = new Chart(document.getElementById('netIncomeChart'), {
     type: 'bar',
-    data: {
-      labels,
-      datasets: [{
-        label: 'Net Income (B USD)',
-        data: netIncomes,
-        backgroundColor: '#059669aa',
-        borderColor: '#059669',
-        borderWidth: 1,
-        ...chartDefaults,
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: { legend: { labels: { color: '#94a3b8' } } },
-      scales: {
-        x: { ticks: { color: '#64748b' }, grid: { color: '#1e2a3a' } },
-        y: { ticks: { color: '#64748b', callback: v => '$' + v + 'B' }, grid: { color: '#1e2a3a' } }
-      }
-    }
+    data: { labels, datasets: [{ label: 'Net Income (B USD)', data: incomes,
+      backgroundColor: '#059669aa', borderColor: '#059669', borderWidth: 1, borderRadius: 6 }] },
+    options: commonOpts()
   });
 }
 
 function renderTable(statements) {
-  const tbody = document.getElementById('incomeTableBody');
-  tbody.innerHTML = statements.map(s => `
+  document.getElementById('incomeTableBody').innerHTML = statements.map(s => `
     <tr>
-      <td>${s.fiscal_period || s.report_period}</td>
+      <td>${s.fiscal_period}</td>
       <td>${fmtUSD(s.revenue)}</td>
       <td>${fmtUSD(s.gross_profit)}</td>
       <td>${fmtUSD(s.operating_income)}</td>
@@ -144,43 +160,46 @@ function renderTable(statements) {
   `).join('');
 }
 
-async function loadTicker(ticker) {
+function loadTicker(ticker) {
   ticker = ticker.trim().toUpperCase();
-  if (!ticker) return;
-
-  showLoading(true);
   showError('');
 
-  try {
-    const [factsRes, snapshotRes, statementsRes] = await Promise.all([
-      fetchJSON(`${API_BASE}/company/facts?ticker=${ticker}`),
-      fetchJSON(`${API_BASE}/prices/snapshot?ticker=${ticker}`),
-      fetchJSON(`${API_BASE}/financials/income-statements?ticker=${ticker}&period=annual&limit=4`),
-    ]);
-
-    const facts = factsRes;
-    const snapshot = snapshotRes?.snapshot || snapshotRes;
-    const statements = statementsRes?.income_statements || statementsRes || [];
-
-    renderCompany(facts, snapshot);
-    renderMetrics(statements);
-    renderCharts(statements);
-    renderTable(statements);
-  } catch (err) {
-    showError(`Failed to load data for "${ticker}". ${err.message}`);
-  } finally {
-    showLoading(false);
+  const data = STATIC_DATA[ticker];
+  if (!data) {
+    showError(`"${ticker}" 데이터가 없습니다. 사용 가능한 티커: ${TICKERS.join(', ')}`);
+    return;
   }
+
+  renderCompany(data.facts, data.snapshot);
+  renderMetrics(data.statements);
+  renderCharts(data.statements);
+  renderTable(data.statements);
+
+  // highlight active button
+  document.querySelectorAll('.ticker-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.ticker === ticker);
+  });
+  document.getElementById('tickerInput').value = ticker;
+}
+
+// Render quick-select ticker buttons
+function renderTickerButtons() {
+  const container = document.getElementById('tickerButtons');
+  container.innerHTML = TICKERS.map(t => `
+    <button class="ticker-btn" data-ticker="${t}">${t}</button>
+  `).join('');
+  container.querySelectorAll('.ticker-btn').forEach(btn => {
+    btn.addEventListener('click', () => loadTicker(btn.dataset.ticker));
+  });
 }
 
 // Event listeners
 document.getElementById('searchBtn').addEventListener('click', () => {
   loadTicker(document.getElementById('tickerInput').value);
 });
-
 document.getElementById('tickerInput').addEventListener('keydown', e => {
   if (e.key === 'Enter') loadTicker(e.target.value);
 });
 
-// Load default ticker
+renderTickerButtons();
 loadTicker('AAPL');
