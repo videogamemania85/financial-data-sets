@@ -44,6 +44,63 @@ body {
 }
 .search-bar button:hover { background: #1d4ed8; }
 
+/* Market Overview */
+.market-overview {
+  background: #1e2330;
+  border: 1px solid #2d3748;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.market-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.market-title { font-size: 1rem; color: #94a3b8; margin: 0; }
+.update-time { font-size: 0.78rem; color: #475569; margin-left: 4px; }
+.refresh-btn {
+  margin-left: auto;
+  background: none;
+  border: 1px solid #2d3748;
+  border-radius: 6px;
+  color: #64748b;
+  width: 28px; height: 28px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex; align-items: center; justify-content: center;
+}
+.refresh-btn:hover { border-color: #60a5fa; color: #60a5fa; }
+.refresh-btn.spinning { animation: spin 0.7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.index-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+.index-card {
+  background: #151a26;
+  border: 1px solid #2d3748;
+  border-radius: 10px;
+  padding: 14px 16px 10px;
+  transition: border-color 0.2s;
+}
+.index-card:hover { border-color: #3d4f6b; }
+.index-name { font-size: 0.78rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+.index-price { font-size: 1.5rem; font-weight: 700; color: #f1f5f9; margin-bottom: 4px; }
+.index-change { font-size: 0.88rem; font-weight: 600; margin-bottom: 6px; }
+.index-change.positive { color: #34d399; }
+.index-change.negative { color: #f87171; }
+.index-change.neutral  { color: #94a3b8; }
+.index-range { font-size: 0.75rem; color: #475569; margin-bottom: 8px; }
+.sparkline { width: 100% !important; height: 40px !important; display: block; }
+.index-card.loading .index-price,
+.index-card.loading .index-change { color: #2d3748; }
+.index-error { font-size: 0.78rem; color: #f87171; margin-top: 4px; }
+
 /* Ticker buttons */
 .ticker-buttons {
   display: flex;

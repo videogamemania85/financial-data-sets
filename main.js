@@ -1,3 +1,124 @@
+// ── Market Overview (Real-time via Yahoo Finance) ──────────────────────────
+
+const INDICES = [
+  { symbol: '^KS11', id: 'KS11',  name: 'KOSPI'   },
+  { symbol: '^KQ11', id: 'KQ11',  name: 'KOSDAQ'  },
+  { symbol: '^IXIC', id: 'IXIC',  name: 'NASDAQ'  },
+  { symbol: '^GSPC', id: 'GSPC',  name: 'S&P 500' },
+];
+
+// Yahoo Finance via corsproxy.io (no API key required)
+const PROXY = 'https://corsproxy.io/?url=';
+const YF_QUOTE = 'https://query1.finance.yahoo.com/v7/finance/quote?symbols=';
+const YF_CHART = 'https://query1.finance.yahoo.com/v8/finance/chart/';
+
+const sparklineCharts = {};
+
+async function fetchMarketData() {
+  const symbols = INDICES.map(i => encodeURIComponent(i.symbol)).join(',');
+  const url = PROXY + encodeURIComponent(YF_QUOTE + symbols);
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const json = await res.json();
+  return json.quoteResponse?.result || [];
+}
+
+async function fetchSparkline(symbol) {
+  const url = PROXY + encodeURIComponent(
+    `${YF_CHART}${encodeURIComponent(symbol)}?interval=1d&range=1mo`
+  );
+  const res = await fetch(url);
+  if (!res.ok) return null;
+  const json = await res.json();
+  const closes = json.chart?.result?.[0]?.indicators?.quote?.[0]?.close;
+  return closes ? closes.filter(v => v != null) : null;
+}
+
+function drawSparkline(canvas, prices, isPositive) {
+  if (sparklineCharts[canvas.id]) sparklineCharts[canvas.id].destroy();
+  const color = isPositive ? '#34d399' : '#f87171';
+  sparklineCharts[canvas.id] = new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels: prices.map((_, i) => i),
+      datasets: [{ data: prices, borderColor: color, borderWidth: 1.5,
+        fill: true, backgroundColor: color + '18',
+        pointRadius: 0, tension: 0.3 }]
+    },
+    options: {
+      responsive: false, animation: false,
+      plugins: { legend: { display: false }, tooltip: { enabled: false } },
+      scales: { x: { display: false }, y: { display: false } }
+    }
+  });
+}
+
+function renderIndexCard(card, quote) {
+  const price = quote.regularMarketPrice;
+  const change = quote.regularMarketChange;
+  const changePct = quote.regularMarketChangePercent;
+  const high = quote.regularMarketDayHigh;
+  const low  = quote.regularMarketDayLow;
+  const isPos = change >= 0;
+  const sign  = isPos ? '+' : '';
+
+  card.querySelector('.index-price').textContent =
+    price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  const chgEl = card.querySelector('.index-change');
+  chgEl.textContent = `${sign}${change.toFixed(2)} (${sign}${changePct.toFixed(2)}%)`;
+  chgEl.className = 'index-change ' + (isPos ? 'positive' : 'negative');
+
+  card.querySelector('.index-range').textContent =
+    `H ${high?.toFixed(2) ?? '—'}  L ${low?.toFixed(2) ?? '—'}`;
+}
+
+async function loadMarketOverview() {
+  const refreshBtn = document.getElementById('refreshBtn');
+  refreshBtn.classList.add('spinning');
+
+  try {
+    const quotes = await fetchMarketData();
+
+    quotes.forEach(quote => {
+      const idx = INDICES.find(i => i.symbol === quote.symbol);
+      if (!idx) return;
+      const card = document.getElementById(`idx-${idx.id}`);
+      if (!card) return;
+      renderIndexCard(card, quote);
+    });
+
+    // Sparklines (fetched in parallel)
+    INDICES.forEach(async idx => {
+      const card = document.getElementById(`idx-${idx.id}`);
+      const canvas = card?.querySelector('.sparkline');
+      if (!canvas) return;
+      canvas.id = `spark-${idx.id}`;
+      const prices = await fetchSparkline(idx.symbol);
+      if (prices?.length) {
+        const isPos = (prices[prices.length - 1] - prices[0]) >= 0;
+        drawSparkline(canvas, prices, isPos);
+      }
+    });
+
+    const now = new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    document.getElementById('marketUpdateTime').textContent = `업데이트: ${now}`;
+  } catch (err) {
+    console.error('Market data fetch failed:', err);
+    document.getElementById('marketUpdateTime').textContent = '데이터 로드 실패 — 재시도 중...';
+  } finally {
+    refreshBtn.classList.remove('spinning');
+  }
+}
+
+// Auto-refresh every 60 seconds
+document.addEventListener('DOMContentLoaded', () => {
+  loadMarketOverview();
+  setInterval(loadMarketOverview, 60_000);
+  document.getElementById('refreshBtn').addEventListener('click', loadMarketOverview);
+});
+
+// ── Static Stock Data ──────────────────────────────────────────────────────
 // Static financial data (fetched 2026-03-12, no API key required)
 const STATIC_DATA = {
   AAPL: {

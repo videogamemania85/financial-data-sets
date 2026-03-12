@@ -16,6 +16,46 @@
         <button id="searchBtn">Search</button>
       </div>
     </header>
+
+    <!-- Market Overview -->
+    <section class="market-overview">
+      <div class="market-header">
+        <h2 class="market-title">Market Overview</h2>
+        <span id="marketUpdateTime" class="update-time">—</span>
+        <button id="refreshBtn" class="refresh-btn" title="Refresh">&#8635;</button>
+      </div>
+      <div class="index-grid">
+        <div class="index-card" id="idx-KS11">
+          <div class="index-name">KOSPI</div>
+          <div class="index-price">—</div>
+          <div class="index-change">—</div>
+          <div class="index-range">—</div>
+          <canvas class="sparkline"></canvas>
+        </div>
+        <div class="index-card" id="idx-KQ11">
+          <div class="index-name">KOSDAQ</div>
+          <div class="index-price">—</div>
+          <div class="index-change">—</div>
+          <div class="index-range">—</div>
+          <canvas class="sparkline"></canvas>
+        </div>
+        <div class="index-card" id="idx-IXIC">
+          <div class="index-name">NASDAQ</div>
+          <div class="index-price">—</div>
+          <div class="index-change">—</div>
+          <div class="index-range">—</div>
+          <canvas class="sparkline"></canvas>
+        </div>
+        <div class="index-card" id="idx-GSPC">
+          <div class="index-name">S&amp;P 500</div>
+          <div class="index-price">—</div>
+          <div class="index-change">—</div>
+          <div class="index-range">—</div>
+          <canvas class="sparkline"></canvas>
+        </div>
+      </div>
+    </section>
+
     <div id="tickerButtons" class="ticker-buttons"></div>
 
     <main class="main" id="main">
