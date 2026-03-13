@@ -1,44 +1,24 @@
 <!doctype html>
-<html lang="en">
+<html lang="ko">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Financial Dashboard</title>
+  <title>KOSPI 대시보드</title>
   <link href='/style.css' rel='stylesheet'>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <div class="app">
     <header class="header">
-      <h1 class="logo">Financial Dashboard</h1>
-      <div class="search-bar">
-        <input type="text" id="tickerInput" placeholder="AAPL, MSFT, TSLA, GOOGL, NVDA" />
-        <button id="searchBtn">Search</button>
-      </div>
+      <h1 class="logo">KOSPI 대시보드</h1>
     </header>
 
-    <!-- Korean Indices Dashboard -->
-    <section class="korean-dashboard">
-      <div class="ki-header">
-        <h2 class="ki-title">한국 지수 대시보드</h2>
-        <div class="ki-tabs">
-          <button class="ki-tab active" data-tab="ALL">전체</button>
-          <button class="ki-tab" data-tab="KOSPI">KOSPI</button>
-          <button class="ki-tab" data-tab="KOSDAQ">KOSDAQ</button>
-          <button class="ki-tab" data-tab="KRX">KRX</button>
-        </div>
-        <span id="kiUpdateTime" class="update-time">—</span>
-        <button id="kiRefreshBtn" class="refresh-btn" title="새로고침">&#8635;</button>
-      </div>
-      <div id="kiGrid" class="ki-grid"></div>
-    </section>
-
-    <!-- Market Overview -->
+    <!-- 시장 지수 -->
     <section class="market-overview">
       <div class="market-header">
-        <h2 class="market-title">Global Overview</h2>
+        <h2 class="market-title">시장 지수</h2>
         <span id="marketUpdateTime" class="update-time">—</span>
-        <button id="refreshBtn" class="refresh-btn" title="Refresh">&#8635;</button>
+        <button id="refreshBtn" class="refresh-btn" title="새로고침">&#8635;</button>
       </div>
       <div class="index-grid">
         <div class="index-card" id="idx-KS11">
@@ -72,85 +52,41 @@
       </div>
     </section>
 
-    <div id="tickerButtons" class="ticker-buttons"></div>
-
-    <main class="main" id="main">
-      <div id="loading" class="loading hidden">Loading...</div>
-      <div id="error" class="error hidden"></div>
-
-      <!-- Company Info -->
-      <section class="card company-card" id="companySection">
-        <div class="company-header">
-          <div>
-            <h2 id="companyName">—</h2>
-            <span id="companyTicker" class="badge">—</span>
-            <span id="companyExchange" class="badge badge-gray">—</span>
-          </div>
-          <div class="price-block">
-            <span id="stockPrice" class="price">—</span>
-            <span id="stockChange" class="change">—</span>
-          </div>
+    <!-- KOSPI 전종목 -->
+    <section class="stock-section">
+      <div class="stock-header">
+        <div class="stock-title-row">
+          <h2 class="stock-title">KOSPI 전종목</h2>
+          <span id="stockUpdateTime" class="update-time">—</span>
+          <button id="stockRefreshBtn" class="refresh-btn" title="새로고침">&#8635;</button>
         </div>
-        <div class="company-meta">
-          <div class="meta-item"><span class="meta-label">Sector</span><span id="companySector">—</span></div>
-          <div class="meta-item"><span class="meta-label">Industry</span><span id="companyIndustry">—</span></div>
-          <div class="meta-item"><span class="meta-label">Location</span><span id="companyLocation">—</span></div>
-          <div class="meta-item"><span class="meta-label">Status</span><span id="companyStatus">—</span></div>
+        <div class="stock-controls">
+          <input type="text" id="stockSearch" class="stock-search" placeholder="종목명 또는 종목코드 검색..." />
+          <span class="stock-count" id="stockCount"></span>
         </div>
-      </section>
-
-      <!-- Key Metrics -->
-      <section class="metrics-grid" id="metricsSection">
-        <div class="card metric-card">
-          <span class="metric-label">Revenue (Latest)</span>
-          <span class="metric-value" id="metricRevenue">—</span>
-        </div>
-        <div class="card metric-card">
-          <span class="metric-label">Net Income (Latest)</span>
-          <span class="metric-value" id="metricNetIncome">—</span>
-        </div>
-        <div class="card metric-card">
-          <span class="metric-label">EPS (Diluted)</span>
-          <span class="metric-value" id="metricEPS">—</span>
-        </div>
-        <div class="card metric-card">
-          <span class="metric-label">Gross Profit Margin</span>
-          <span class="metric-value" id="metricGrossMargin">—</span>
-        </div>
-      </section>
-
-      <!-- Charts -->
-      <section class="charts-grid">
-        <div class="card">
-          <h3>Revenue (Annual)</h3>
-          <canvas id="revenueChart"></canvas>
-        </div>
-        <div class="card">
-          <h3>Net Income (Annual)</h3>
-          <canvas id="netIncomeChart"></canvas>
-        </div>
-      </section>
-
-      <!-- Income Statement Table -->
-      <section class="card" id="tableSection">
-        <h3>Income Statement</h3>
-        <div class="table-wrap">
-          <table id="incomeTable">
-            <thead>
-              <tr>
-                <th>Period</th>
-                <th>Revenue</th>
-                <th>Gross Profit</th>
-                <th>Operating Income</th>
-                <th>Net Income</th>
-                <th>EPS</th>
-              </tr>
-            </thead>
-            <tbody id="incomeTableBody"></tbody>
-          </table>
-        </div>
-      </section>
-    </main>
+      </div>
+      <div id="stockError" class="error hidden"></div>
+      <div class="table-wrap">
+        <table id="stockTable">
+          <thead>
+            <tr>
+              <th class="sortable" data-col="ISU_SRT_CD">종목코드</th>
+              <th class="sortable" data-col="ISU_ABBRV">종목명</th>
+              <th class="sortable th-num" data-col="TDD_CLSPRC">현재가</th>
+              <th class="sortable th-num" data-col="CMPPREVDD_PRC">전일비</th>
+              <th class="sortable th-num" data-col="FLUC_RT">등락률</th>
+              <th class="sortable th-num" data-col="ACC_TRDVOL">거래량</th>
+              <th class="sortable th-num" data-col="ACC_TRDVAL">거래대금</th>
+              <th class="sortable th-num" data-col="MKTCAP">시가총액</th>
+            </tr>
+          </thead>
+          <tbody id="stockTableBody">
+            <tr><td colspan="8" class="table-placeholder">데이터 로딩 중...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination" id="pagination"></div>
+    </section>
   </div>
 
   <script defer type="text/javascript" src="/main.js"></script>
