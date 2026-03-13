@@ -137,7 +137,7 @@ async function loadMarketOverview() {
 
 let allStocks      = [];
 let filteredStocks = [];
-let sortCol  = 'MKTCAP';
+let sortCol  = 'marketCap';
 let sortDir  = -1;        // -1 내림차순, 1 오름차순
 let curPage  = 1;
 const PG = 50;
@@ -159,10 +159,11 @@ function fmtVol(n) {
   return n.toLocaleString('ko-KR');
 }
 
-function rateChip(rate, sign) {
-  if (rate > 0)  return `<span class="chip-up">${sign}${rate.toFixed(2)}%</span>`;
-  if (rate < 0)  return `<span class="chip-down">${rate.toFixed(2)}%</span>`;
-  return `<span class="chip-flat">0.00%</span>`;
+function rateChip(rateStr) {
+  const r = parseFloat(rateStr);
+  if (r > 0)  return `<span class="chip-up">${rateStr}</span>`;
+  if (r < 0)  return `<span class="chip-down">${rateStr}</span>`;
+  return `<span class="chip-flat">${rateStr}</span>`;
 }
 
 function renderTable() {
@@ -175,24 +176,21 @@ function renderTable() {
     return;
   }
 
-  tbody.innerHTML = slice.map((s, idx) => {
-    const price  = num(s.TDD_CLSPRC);
-    const change = num(s.CMPPREVDD_PRC);
-    const rate   = num(s.FLUC_RT);
-    const isUp   = change > 0;
-    const isDown = change < 0;
-    const sign   = isUp ? '+' : '';
+  tbody.innerHTML = slice.map(s => {
+    const change = s.change ?? '';
+    const isUp   = change.startsWith('+') && change !== '+0';
+    const isDown = change.startsWith('-');
     const cls    = isUp ? 'up' : isDown ? 'down' : 'flat';
 
     return `<tr>
-      <td class="td-code">${s.ISU_SRT_CD}</td>
-      <td class="td-name">${s.ISU_ABBRV}</td>
-      <td class="td-num">${price.toLocaleString('ko-KR')}</td>
-      <td class="td-num ${cls}">${sign}${change.toLocaleString('ko-KR')}</td>
-      <td class="td-num">${rateChip(rate, sign)}</td>
-      <td class="td-num">${fmtVol(num(s.ACC_TRDVOL))}</td>
-      <td class="td-num">${fmtKRW(num(s.ACC_TRDVAL))}</td>
-      <td class="td-num">${fmtKRW(num(s.MKTCAP))}</td>
+      <td class="td-code">${s.code}</td>
+      <td class="td-name">${s.name}</td>
+      <td class="td-num">${s.price}</td>
+      <td class="td-num ${cls}">${change}</td>
+      <td class="td-num">${rateChip(s.changeRate)}</td>
+      <td class="td-num">${fmtVol(num(s.volume))}</td>
+      <td class="td-num">${fmtKRW(num(s.tradingVal))}</td>
+      <td class="td-num">${fmtKRW(num(s.marketCap))}</td>
     </tr>`;
   }).join('');
 
@@ -223,10 +221,10 @@ function renderPagination() {
 
 function applyFilterSort() {
   const q = document.getElementById('stockSearch').value.trim().toLowerCase();
-  const isText = sortCol === 'ISU_SRT_CD' || sortCol === 'ISU_ABBRV';
+  const isText = sortCol === 'code' || sortCol === 'name';
 
   filteredStocks = allStocks.filter(s =>
-    !q || s.ISU_SRT_CD.toLowerCase().includes(q) || s.ISU_ABBRV.toLowerCase().includes(q)
+    !q || s.code.toLowerCase().includes(q) || s.name.toLowerCase().includes(q)
   );
   filteredStocks.sort((a, b) => {
     const v = isText
@@ -305,7 +303,7 @@ document.addEventListener('DOMContentLoaded', () => {
         sortDir *= -1;
       } else {
         sortCol = col;
-        sortDir = (col === 'ISU_SRT_CD' || col === 'ISU_ABBRV') ? 1 : -1;
+        sortDir = (col === 'code' || col === 'name') ? 1 : -1;
       }
       document.querySelectorAll('th.sortable').forEach(t => t.classList.remove('sort-asc', 'sort-desc'));
       th.classList.add(sortDir === 1 ? 'sort-asc' : 'sort-desc');
@@ -315,7 +313,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // 기본 정렬 표시
-  document.querySelector('th[data-col="MKTCAP"]')?.classList.add('sort-desc');
+  document.querySelector('th[data-col="marketCap"]')?.classList.add('sort-desc');
 
   // 페이지네이션
   document.getElementById('pagination').addEventListener('click', e => {
