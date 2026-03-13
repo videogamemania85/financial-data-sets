@@ -17,10 +17,26 @@
       </div>
     </header>
 
+    <!-- Korean Indices Dashboard -->
+    <section class="korean-dashboard">
+      <div class="ki-header">
+        <h2 class="ki-title">한국 지수 대시보드</h2>
+        <div class="ki-tabs">
+          <button class="ki-tab active" data-tab="ALL">전체</button>
+          <button class="ki-tab" data-tab="KOSPI">KOSPI</button>
+          <button class="ki-tab" data-tab="KOSDAQ">KOSDAQ</button>
+          <button class="ki-tab" data-tab="KRX">KRX</button>
+        </div>
+        <span id="kiUpdateTime" class="update-time">—</span>
+        <button id="kiRefreshBtn" class="refresh-btn" title="새로고침">&#8635;</button>
+      </div>
+      <div id="kiGrid" class="ki-grid"></div>
+    </section>
+
     <!-- Market Overview -->
     <section class="market-overview">
       <div class="market-header">
-        <h2 class="market-title">Market Overview</h2>
+        <h2 class="market-title">Global Overview</h2>
         <span id="marketUpdateTime" class="update-time">—</span>
         <button id="refreshBtn" class="refresh-btn" title="Refresh">&#8635;</button>
       </div>

@@ -1,3 +1,132 @@
+// ── Korean Indices Dashboard ─────────────────────────────────────────────────
+
+const KI_CONFIG = {
+  KOSPI: [
+    { symbol: '^KS11',  name: 'KOSPI 종합',  sub: 'Composite' },
+    { symbol: '^KS200', name: 'KOSPI 200',   sub: 'Top 200' },
+    { symbol: '^KS100', name: 'KOSPI 100',   sub: 'Top 100' },
+    { symbol: '^KS50',  name: 'KOSPI 50',    sub: 'Top 50' },
+  ],
+  KOSDAQ: [
+    { symbol: '^KQ11',  name: 'KOSDAQ 종합', sub: 'Composite' },
+    { symbol: '^KQ150', name: 'KOSDAQ 150',  sub: 'Top 150' },
+  ],
+  KRX: [
+    { symbol: '^KRX300', name: 'KRX 300', sub: 'Combined 300' },
+  ],
+};
+
+const kiSparklines = {};
+let kiData = {};
+let kiActiveTab = 'ALL';
+
+function drawKiSparkline(canvasId, prices, isPositive) {
+  if (kiSparklines[canvasId]) kiSparklines[canvasId].destroy();
+  const color = isPositive ? '#34d399' : '#f87171';
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  kiSparklines[canvasId] = new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels: prices.map((_, i) => i),
+      datasets: [{ data: prices, borderColor: color, borderWidth: 1.5,
+        fill: true, backgroundColor: color + '18', pointRadius: 0, tension: 0.3 }]
+    },
+    options: {
+      responsive: false, animation: false,
+      plugins: { legend: { display: false }, tooltip: { enabled: false } },
+      scales: { x: { display: false }, y: { display: false } }
+    }
+  });
+}
+
+function renderKiGrid() {
+  const grid = document.getElementById('kiGrid');
+  const allGroups = kiActiveTab === 'ALL'
+    ? Object.entries(KI_CONFIG)
+    : [[kiActiveTab, KI_CONFIG[kiActiveTab]]];
+
+  grid.innerHTML = allGroups.map(([group, indices]) => `
+    <div class="ki-group">
+      <div class="ki-group-label">${group}</div>
+      <div class="ki-cards">
+        ${indices.map(cfg => {
+          const d = kiData[cfg.symbol];
+          if (!d || d.error) {
+            return `
+              <div class="ki-card ki-card--error">
+                <div class="ki-card-name">${cfg.name}</div>
+                <div class="ki-card-sub">${cfg.sub}</div>
+                <div class="ki-card-nodata">데이터 없음</div>
+              </div>`;
+          }
+          const isPos = d.change >= 0;
+          const sign  = isPos ? '+' : '';
+          const canvasId = `ki-spark-${cfg.symbol.replace('^', '')}`;
+          return `
+            <div class="ki-card ${isPos ? 'ki-card--pos' : 'ki-card--neg'}">
+              <div class="ki-card-header">
+                <div>
+                  <div class="ki-card-name">${cfg.name}</div>
+                  <div class="ki-card-sub">${cfg.sub}</div>
+                </div>
+                <div class="ki-card-price-block">
+                  <div class="ki-card-price">${d.price.toLocaleString('ko-KR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                  <div class="ki-card-change ${isPos ? 'positive' : 'negative'}">${sign}${d.change.toFixed(2)} (${sign}${d.changePct.toFixed(2)}%)</div>
+                </div>
+              </div>
+              <div class="ki-card-range">고가 ${d.dayHigh?.toFixed(2) ?? '—'} · 저가 ${d.dayLow?.toFixed(2) ?? '—'}</div>
+              <canvas id="${canvasId}" class="ki-sparkline"></canvas>
+            </div>`;
+        }).join('')}
+      </div>
+    </div>
+  `).join('');
+
+  // Draw sparklines after DOM is ready
+  allGroups.forEach(([, indices]) => {
+    indices.forEach(cfg => {
+      const d = kiData[cfg.symbol];
+      if (!d || d.error || !d.closes?.length) return;
+      const canvasId = `ki-spark-${cfg.symbol.replace('^', '')}`;
+      drawKiSparkline(canvasId, d.closes, d.change >= 0);
+    });
+  });
+}
+
+async function loadKoreanIndices() {
+  const btn = document.getElementById('kiRefreshBtn');
+  btn.classList.add('spinning');
+  try {
+    const res = await fetch('/api/korean-indices');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const arr = await res.json();
+    arr.forEach(item => { kiData[item.symbol] = item; });
+    renderKiGrid();
+    const now = new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    document.getElementById('kiUpdateTime').textContent = `업데이트: ${now}`;
+  } catch (err) {
+    console.error('Korean indices fetch failed:', err);
+    document.getElementById('kiUpdateTime').textContent = '로드 실패';
+  } finally {
+    btn.classList.remove('spinning');
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  loadKoreanIndices();
+  setInterval(loadKoreanIndices, 60_000);
+  document.getElementById('kiRefreshBtn').addEventListener('click', loadKoreanIndices);
+  document.querySelectorAll('.ki-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.ki-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      kiActiveTab = tab.dataset.tab;
+      renderKiGrid();
+    });
+  });
+});
+
 // ── Market Overview (Real-time via Yahoo Finance) ──────────────────────────
 
 const INDICES = [

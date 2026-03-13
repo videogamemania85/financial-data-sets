@@ -44,6 +44,86 @@ body {
 }
 .search-bar button:hover { background: #1d4ed8; }
 
+/* Korean Indices Dashboard */
+.korean-dashboard {
+  background: #1e2330;
+  border: 1px solid #2d3748;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.ki-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.ki-title { font-size: 1rem; font-weight: 700; color: #e2e8f0; white-space: nowrap; }
+.ki-tabs {
+  display: flex;
+  gap: 4px;
+  background: #151a26;
+  border: 1px solid #2d3748;
+  border-radius: 8px;
+  padding: 3px;
+}
+.ki-tab {
+  background: none;
+  border: none;
+  border-radius: 6px;
+  color: #64748b;
+  padding: 4px 14px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.ki-tab:hover { color: #94a3b8; }
+.ki-tab.active { background: #2563eb; color: #fff; }
+.ki-group { margin-bottom: 16px; }
+.ki-group:last-child { margin-bottom: 0; }
+.ki-group-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 8px;
+}
+.ki-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px;
+}
+.ki-card {
+  background: #151a26;
+  border: 1px solid #2d3748;
+  border-radius: 10px;
+  padding: 14px 16px 10px;
+  transition: border-color 0.2s;
+}
+.ki-card:hover { border-color: #3d4f6b; }
+.ki-card--pos { border-left: 3px solid #34d39940; }
+.ki-card--neg { border-left: 3px solid #f8717140; }
+.ki-card--error { opacity: 0.45; }
+.ki-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.ki-card-name { font-size: 0.88rem; font-weight: 700; color: #e2e8f0; }
+.ki-card-sub { font-size: 0.72rem; color: #475569; margin-top: 2px; }
+.ki-card-price-block { text-align: right; }
+.ki-card-price { font-size: 1.1rem; font-weight: 700; color: #f1f5f9; white-space: nowrap; }
+.ki-card-change { font-size: 0.78rem; font-weight: 600; white-space: nowrap; }
+.ki-card-range { font-size: 0.72rem; color: #475569; margin-bottom: 8px; }
+.ki-card-nodata { font-size: 0.8rem; color: #475569; padding: 8px 0; }
+.ki-sparkline { width: 100% !important; height: 44px !important; display: block; }
+
 /* Market Overview */
 .market-overview {
   background: #1e2330;
